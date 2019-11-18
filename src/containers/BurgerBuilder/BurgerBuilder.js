@@ -43,10 +43,36 @@ class BurgerBuilder extends Component {
     }
 
     removeIngredientHandler = (type) => {
-
+        const oldCount = this.state.ingredients[type];
+        //if there isn't any of a certain ingredient, want to return (and below will disable button in render method)
+        if(oldCount <= 0) {
+            return;
+        } 
+        const updatedCount = oldCount - 1;
+        //create new object so state can be updated in an immutable way
+        const updatedIngredients = {
+            ...this.state.ingredients
+        };
+        updatedIngredients[type] = updatedCount;
+        const priceDeduction = INGREDIENT_PRICES[type];
+        const oldPrice = this.state.totalPrice;
+        const newPrice = oldPrice - priceDeduction;
+        this.setState({
+            totalPrice: newPrice, 
+            ingredients: updatedIngredients})
     }
 
     render() {
+        //create copy of state for disabled button functionality
+        const disabledInfo = {
+            ...this.state.ingredients
+        };
+        //loop through all keys in disabledInfo and check if 0 or less and update the disabledInfo[key] with that information from that check
+        for (let key in disabledInfo) {
+            //this check will return true or false
+            //e.g., {salad: true, meat: false}
+            disabledInfo[key] = disabledInfo[key] <= 0
+        }
         // Return JSX code
         return (
             <React.Fragment>
@@ -54,6 +80,7 @@ class BurgerBuilder extends Component {
                 <BuildControls 
                     ingredientAdded={this.addIngredientHandler}
                     ingredientRemoved={this.removeIngredientHandler}
+                    disabled={disabledInfo}
                 />
             </React.Fragment>
         );
