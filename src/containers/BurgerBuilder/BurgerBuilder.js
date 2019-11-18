@@ -22,8 +22,24 @@ class BurgerBuilder extends Component {
                 cheese: 0,
                 meat: 0
             },
-            totalPrice: 4
+            totalPrice: 4,
+            purchasable: false
         }
+    }
+
+    //create updatePurchaseState method to be run at end of addIngredientHandler and RemoveIngredientHandler to check whether we should turn purchasable to true or false
+    updatePurchaseState (ingredients) {
+        //get ingredients from argument, which will be passed in as updated ingredients from addIngredientHandler and removeIngredientHandler
+        //turn into array to sum
+        const sum = Object.keys(ingredients)
+            .map(igKey => {
+                return ingredients[igKey];
+            })
+            .reduce((sum, el) => {
+                return sum + el;
+            }, 0);
+        //set state to true or false
+        this.setState({purchasable: sum > 0});
     }
 
     addIngredientHandler = (type) => {
@@ -40,6 +56,7 @@ class BurgerBuilder extends Component {
         this.setState({
             totalPrice: newPrice, 
             ingredients: updatedIngredients})
+        this.updatePurchaseState(updatedIngredients);
     }
 
     removeIngredientHandler = (type) => {
@@ -60,6 +77,7 @@ class BurgerBuilder extends Component {
         this.setState({
             totalPrice: newPrice, 
             ingredients: updatedIngredients})
+        this.updatePurchaseState(updatedIngredients);
     }
 
     render() {
@@ -81,6 +99,7 @@ class BurgerBuilder extends Component {
                     ingredientAdded={this.addIngredientHandler}
                     ingredientRemoved={this.removeIngredientHandler}
                     disabled={disabledInfo}
+                    purchasable={!this.state.purchasable}
                     price={this.state.totalPrice}
                 />
             </React.Fragment>
