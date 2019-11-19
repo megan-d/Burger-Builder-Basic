@@ -1,11 +1,12 @@
 import React from 'react';
 // import Aux from '../../hoc/Aux';
 import classes from './Layout.module.css';
+import Toolbar from '../Navigation/Toolbar/Toolbar';
 
 const Layout = (props) => (
     <React.Fragment>
         {/* //Will replace below div with separate components */}
-        <div>Toolbar, SideDrawer, Backdrop</div>
+        <Toolbar />
         <main className={classes.Content}>
             {/* Output component we wrap with this layout */}
             {props.children}
