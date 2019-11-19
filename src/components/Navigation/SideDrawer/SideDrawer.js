@@ -2,18 +2,26 @@ import React from 'react';
 import classes from './SideDrawer.module.css';
 import Logo from '../../Logo/Logo';
 import NavigationItems from '../NavigationItems/NavigationItems';
+import Backdrop from '../../UI/Backdrop/Backdrop';
 
 const sideDrawer = (props) => {
-    //Play open and close animation when slides in and out
+    //Play open and close animation when slides in and out. Open class should be added when props.open is true.
+    let attachedClasses = [classes.SideDrawer, classes.Close];
+    if(props.open) {
+        attachedClasses = [classes.SideDrawer, classes.Open];
+    }
     return(
-        <div className={classes.SideDrawer}>
-            <div className={classes.Logo}>
-                <Logo />
+        <React.Fragment>
+            <Backdrop show={props.open} clicked={props.closed}/>
+            <div className={attachedClasses.join(' ')}>
+                <div className={classes.Logo}>
+                    <Logo />
+                </div>
+                <nav>
+                    <NavigationItems />
+                </nav>
             </div>
-            <nav>
-                <NavigationItems />
-            </nav>
-        </div>
+        </React.Fragment>
     );
 };
 
