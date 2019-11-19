@@ -6,7 +6,7 @@ import SideDrawer from '../Navigation/SideDrawer/SideDrawer';
 
 class Layout extends Component {
     state = {
-        showSideDrawer: true
+        showSideDrawer: false
     }
 
     // implememnt method now that is class component to handle closing sidedrawer
@@ -14,24 +14,29 @@ class Layout extends Component {
         this.setState({showSideDrawer: false})
     }
     
+    //method to handle toggling state showSideDrawert when hamburger icon in toolbar is clicked. Make sure to use this prevState way since setting state that depends on old state.
+    sideDrawerToggleHandler = () => {
+        this.setState((prevState) => {
+            return {showSideDrawer: !prevState.showSideDrawer};
+    });
+}
+    
     render() {
         return (
             <React.Fragment>
                 {/* //Will replace below div with separate components */}
-                <Toolbar />
-                <SideDrawer open={this.state.showSideDrawer} closed={this.sideDrawerClosedHandler}/>
+                <Toolbar 
+                    drawerToggleClicked={this.sideDrawerToggleHandler} />
+                <SideDrawer 
+                    open={this.state.showSideDrawer} 
+                    closed={this.sideDrawerClosedHandler}/>
                 <main className={classes.Content}>
                     {/* Output component we wrap with this layout */}
                     {this.props.children}
                 </main>
             </React.Fragment>
         )
-        
     }
-    
 }
     
-
-
-
 export default Layout;
