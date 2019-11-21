@@ -3,6 +3,8 @@ import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
+import Spinner from '../../components/UI/Spinner/Spinner';
+import axios from '../../axios-orders';
 // import Aux from '../../hoc/Aux/Aux';
 
 
@@ -26,7 +28,8 @@ class BurgerBuilder extends Component {
             },
             totalPrice: 4,
             purchasable: false,
-            purchasing: false
+            purchasing: false,
+            loading: false
         }
     }
 
@@ -96,7 +99,38 @@ class BurgerBuilder extends Component {
 
     //method to run when press continue button in OrderSummary
     purchaseContinueHandler = () => {
-        alert('You continue!');
+        //update state for loading
+        this.setState({loading: true});
+        //send data to backend
+        const order = {
+            ingredients: this.state.ingredients,
+            //note: for production application, would want to calculate price on server
+            price: this.state.totalPrice,
+            customer: {
+                name: 'John Smith',
+                address: {
+                    street: 'Teststreet 1',
+                    zipCode: '13445',
+                    country: 'Italy'
+                },
+                email: 'test@test.com'
+            },
+            deliveryMethod: 'fastest'
+        }
+        axios.post('/orders.json', order)
+            //stop loading once get response
+            .then(response => {
+                this.setState({
+                    loading: false,
+                    purchasing: false,
+                })
+            })
+            .catch(error => {
+                this.setState({
+                    loading: false,
+                    purchasing: false,
+                })
+            });
     }
 
     render() {
@@ -110,17 +144,24 @@ class BurgerBuilder extends Component {
             //e.g., {salad: true, meat: false}
             disabledInfo[key] = disabledInfo[key] <= 0
         }
+
+        //set up functionality to either display order summary if ready or loading if loading
+        let orderSummary = <OrderSummary 
+            ingredients={this.state.ingredients}
+            price={this.state.totalPrice}
+            purchaseCancelled= {this.purchaseCancelHandler}
+            purchaseContinued={this.purchaseContinueHandler}/>
+        if(this.state.loading) {
+            orderSummary = <Spinner />
+        }
+
         // Return JSX code
         return (
             <React.Fragment>
                 <Modal 
                     show={this.state.purchasing}
                     modalClosed={this.purchaseCancelHandler}>
-                    <OrderSummary 
-                        ingredients={this.state.ingredients}
-                        price={this.state.totalPrice}
-                        purchaseCancelled= {this.purchaseCancelHandler}
-                        purchaseContinued={this.purchaseContinueHandler}/>
+                    {orderSummary}
                 </Modal>
                 <Burger ingredients={this.state.ingredients}/>
                 <BuildControls 

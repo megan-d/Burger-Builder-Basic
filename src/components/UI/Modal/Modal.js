@@ -4,10 +4,10 @@ import Backdrop from '../Backdrop/Backdrop';
 
 //Using parenthese allows for implicit return
 class Modal extends Component {
-    //control updating of order summary by changing how modal updates. only want to update if show changes.
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     return nextProps.show !== this.props.show;
-    // }
+    //control updating of order summary by changing how modal updates. only want to update if show changes or order placed (children updated).
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextProps.show !== this.props.show || nextProps.children !== this.props.children;
+    }
 
     // componentDidUpdate () {
     //     console.log('[Modal] DidUpdate')
