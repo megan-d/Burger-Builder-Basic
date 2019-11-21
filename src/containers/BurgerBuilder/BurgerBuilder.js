@@ -21,17 +21,24 @@ class BurgerBuilder extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            ingredients: {
-                salad: 0,
-                bacon: 0,
-                cheese: 0,
-                meat: 0
-            },
+            //set initial ingredients to null because fetching from firebase
+            ingredients: null,
             totalPrice: 4,
             purchasable: false,
             purchasing: false,
-            loading: false
+            loading: false,
+            error: false
         }
+    }
+
+    componentDidMount() {
+        axios.get('https://react-my-burger-91222.firebaseio.com/ingredients.json')
+            .then(response => {
+                this.setState({ingredients: response.data});
+            })
+            .catch(error => {
+                this.setState({error: true})
+            });
     }
 
     //create updatePurchaseState method to be run at end of addIngredientHandler and RemoveIngredientHandler to check whether we should turn purchasable to true or false
@@ -118,7 +125,7 @@ class BurgerBuilder extends Component {
             },
             deliveryMethod: 'fastest'
         }
-        axios.post('/orders/json', order)
+        axios.post('/orders.json', order)
             //stop loading once get response
             .then(response => {
                 this.setState({
@@ -147,11 +154,32 @@ class BurgerBuilder extends Component {
         }
 
         //set up functionality to either display order summary if ready or loading if loading
-        let orderSummary = <OrderSummary 
+        let orderSummary = null;
+        //show Burger and Build Controls components once the ingredients data is fetched from back end. Before then, show spinner.
+        let burger = this.state.error? <p>Ingredients can't be loaded!</p> : <Spinner />
+        //if ingredients is not null (i.e., they have loaded), then don't show spinner but show components instead. also show order summary.
+        if(this.state.ingredients) {
+            burger = (
+                <React.Fragment>
+                    <Burger 
+                        ingredients={this.state.ingredients}/>
+                    <BuildControls 
+                        ingredientAdded={this.addIngredientHandler}
+                        ingredientRemoved={this.removeIngredientHandler}
+                        disabled={disabledInfo}
+                        purchasable={!this.state.purchasable}
+                        ordered={this.purchaseHandler}
+                        price={this.state.totalPrice}
+                    />
+                </React.Fragment>
+            );
+            orderSummary = <OrderSummary 
             ingredients={this.state.ingredients}
             price={this.state.totalPrice}
             purchaseCancelled= {this.purchaseCancelHandler}
             purchaseContinued={this.purchaseContinueHandler}/>
+        }
+          //show spinner if page is loading
         if(this.state.loading) {
             orderSummary = <Spinner />
         }
@@ -164,15 +192,7 @@ class BurgerBuilder extends Component {
                     modalClosed={this.purchaseCancelHandler}>
                     {orderSummary}
                 </Modal>
-                <Burger ingredients={this.state.ingredients}/>
-                <BuildControls 
-                    ingredientAdded={this.addIngredientHandler}
-                    ingredientRemoved={this.removeIngredientHandler}
-                    disabled={disabledInfo}
-                    purchasable={!this.state.purchasable}
-                    ordered={this.purchaseHandler}
-                    price={this.state.totalPrice}
-                />
+                {burger}
             </React.Fragment>
         );
     }
