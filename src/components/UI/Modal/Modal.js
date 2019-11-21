@@ -16,19 +16,19 @@ class Modal extends Component {
     render() {
         return(
             //change modal depending on the show property (whether it should be shown or not)
-            <React.Fragment>
-            <Backdrop 
-                show={this.props.show} 
-                clicked={this.props.modalClosed}/>
-            <div 
-                className={classes.Modal}
-                style={{
-                    transform: this.props.show ? 'translateY(0)' : 'translateY(-100vh)',
-                    opacity: this.props.show ? '1' : '0'
-                }}>
-             {/* props.children can be anything */}
-                {this.props.children}
-            </div>
+                <React.Fragment>
+                <Backdrop 
+                    show={this.props.show} 
+                    clicked={this.props.modalClosed}/>
+                <div 
+                    className={classes.Modal}
+                    style={{
+                        transform: this.props.show ? 'translateY(0)' : 'translateY(-100vh)',
+                        opacity: this.props.show ? '1' : '0'
+                    }}>
+                {/* props.children can be anything */}
+                    {this.props.children}
+                </div>
             </React.Fragment>
         )
     }
