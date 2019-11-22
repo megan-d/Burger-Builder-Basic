@@ -9,15 +9,20 @@ const withErrorHandler = (WrappedComponent, axios) => {
                 error: null,
             }
             //register intercepts within constructor so it's there before child components are rendered
-            axios.interceptors.request.use(req => {
+            this.reqInterceptor = axios.interceptors.request.use(req => {
                 //clear any errors before setting state
                 this.setState({error: null})
                 return req;
             })
             //Set up global interceptor for errors. 
-            axios.interceptors.response.use(res => res, error => {
+            this.resInterceptor = axios.interceptors.response.use(res => res, error => {
                 this.setState({error: error})
             });
+        }
+
+        componentWillUnmount() {
+            axios.interceptors.request.eject(this.reqInterceptor);
+            axios.interceptors.response.eject(this.resInterceptor);
         }
         
         errorConfirmedHandler = () => {
@@ -42,6 +47,5 @@ const withErrorHandler = (WrappedComponent, axios) => {
     } 
 }
 }
-
 
 export default withErrorHandler;
